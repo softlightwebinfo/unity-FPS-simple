@@ -1,9 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-
-public class GameManager : MonoBehaviour
+public class GameManager : MonoBehaviour, IManager
 {
     [SerializeField]
     private int _itemsCollected = 0;
@@ -12,6 +10,12 @@ public class GameManager : MonoBehaviour
     public string labelText = "Recolecta los 4 items y ganate lla libertad";
     public bool showWinScreen = false;
     public bool showLossScreen = false;
+    public string _state;
+
+    private void Start()
+    {
+        this.Initialize();
+    }
 
     public int items
     {
@@ -47,6 +51,15 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+
+    public string State { get => _state; set => _state = value; }
+
+    public void Initialize()
+    {
+        State = "Manager inicializado";
+        Debug.Log(State);
+    }
+
     private void GameOver(bool gameWon)
     {
         labelText = gameWon ? "Has encontrado todos los items" : "Has muerto... Prueba otra vez!";
@@ -64,8 +77,7 @@ public class GameManager : MonoBehaviour
     {
         if (GUI.Button(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 400, 200), text))
         {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-            Time.timeScale = 1;
+            Utilities.RestartLevel();
         }
     }
 
