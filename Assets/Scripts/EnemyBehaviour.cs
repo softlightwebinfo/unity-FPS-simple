@@ -12,10 +12,27 @@ public class EnemyBehaviour : MonoBehaviour
     private NavMeshAgent _agent;
     private float currentDelay = 0.0f;
     public float maxDelay = 0.5f;
+    public Transform player;
+    private float _health = 3.0f;
+
+    public float health
+    {
+        get { return _health; }
+        private set
+        {
+            _health = value;
+            if (_health <= 0)
+            {
+                Destroy(this.gameObject);
+                Debug.Log("OOH, me ha mataooo");
+            }
+        }
+    }
 
     private void Start()
     {
         _agent = GetComponent<NavMeshAgent>();
+        player = GameObject.Find("Player").transform;
         this.InitializeWaypoints();
         this.MoveToNextWaypoint();
     }
@@ -49,19 +66,28 @@ public class EnemyBehaviour : MonoBehaviour
         locationIndex = Random.Range(0, waypoints.Count);
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerStay(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.tag == "Player")
         {
-
+            _agent.SetDestination(player.position);
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.CompareTag("Player"))
+        if (other.tag == "Player")
         {
+            this.MoveToNextWaypoint();
+        }
+    }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.tag == "Bullet")
+        {
+            this.health--;
+            Debug.Log("Auuuh duele, Daño recibido");
         }
     }
 }

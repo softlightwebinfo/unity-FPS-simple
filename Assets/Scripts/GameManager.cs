@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour
     private float _playerHP = 100f;
     public string labelText = "Recolecta los 4 items y ganate lla libertad";
     public bool showWinScreen = false;
+    public bool showLossScreen = false;
 
     public int items
     {
@@ -19,9 +20,7 @@ public class GameManager : MonoBehaviour
         {
             if (value >= maxItems)
             {
-                labelText = "Has encontrado todos los items";
-                showWinScreen = true;
-                Time.timeScale = 0;
+                this.GameOver(true);
             }
             else
             {
@@ -31,18 +30,58 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public float playerHP
+    {
+        get { return _playerHP; }
+        set
+        {
+            _playerHP = value;
+
+            if (value <= 0)
+            {
+                this.GameOver(false);
+            }
+            else
+            {
+                labelText = "Ouch, me han dado...";
+            }
+        }
+    }
+    private void GameOver(bool gameWon)
+    {
+        labelText = gameWon ? "Has encontrado todos los items" : "Has muerto... Prueba otra vez!";
+        showWinScreen = gameWon;
+        showLossScreen = !gameWon;
+        Time.timeScale = 0;
+    }
+
+    public string GetPlayerHpString()
+    {
+        return playerHP.ToString("N2");
+    }
+
+    private void ShowEndLevel(string text)
+    {
+        if (GUI.Button(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 400, 200), text))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            Time.timeScale = 1;
+        }
+    }
+
     private void OnGUI()
     {
-        GUI.Box(new Rect(25, 25, 180, 25), $"Vida: {_playerHP}");
+        GUI.Box(new Rect(25, 25, 180, 25), $"Vida: {this.GetPlayerHpString()}");
         GUI.Box(new Rect(25, 25 + 25 + 15, 180, 25), $"Items recogidos: {items}");
         GUI.Label(new Rect(Screen.width / 2 - 100, Screen.height - 50, 400, 50), labelText);
         if (showWinScreen)
         {
-            if (GUI.Button(new Rect(Screen.width / 2 - 200, Screen.height / 2 - 100, 400, 200), "HAS GANADO!"))
-            {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-                Time.timeScale = 1;
-            }
+            this.ShowEndLevel("Enhorabuena, Has ganado!");
+        }
+
+        if (showLossScreen)
+        {
+            this.ShowEndLevel("GAME OVER!");
         }
     }
 }

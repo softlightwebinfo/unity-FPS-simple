@@ -16,12 +16,14 @@ public class PlayerController : MonoBehaviour
     public GameObject bullet;
     public Transform shootPoint;
     public float bulletSpeed = 100.0f;
+    private GameManager gameManager;
 
     void Start()
     {
         this._rb = GetComponent<Rigidbody>();
         this.currentMoveSpeed = moveSpeed;
         this._col = GetComponent<CapsuleCollider>();
+        this.gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
 
@@ -70,5 +72,13 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 capsuleBottom = new Vector3(_col.bounds.center.x, _col.bounds.min.y, _col.bounds.center.z);
         return Physics.CheckCapsule(_col.bounds.center, capsuleBottom, distanceToGround, groundLayer, QueryTriggerInteraction.Ignore);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+            gameManager.playerHP -= Random.Range(0.0f, 10.0f);
+        }
     }
 }
